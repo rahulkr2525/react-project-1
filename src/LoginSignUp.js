@@ -28,10 +28,14 @@ const LoginSignup = ({navigation, route}) => {
 
       const response = await axios({
         method: 'POST',
-        url: 'http://192.168.25.169:4000/api/v1/login',
+        url: 'http://192.168.1.5:4000/api/v1/login',
         data: datas,
       });
-      console.log('gg', response);
+      console.log('gg', response.data.result);
+      if (response.data.token) {
+        navigation.navigate('Home');
+      }
+      //console.log('gg', response.data.token);
     } catch (error) {
       console.log(error);
     }

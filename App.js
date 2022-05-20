@@ -9,20 +9,14 @@ import AndarBahar from './src/AndarBahar';
 import LoginSignup from './src/LoginSignUp';
 import Tossgame from './src/Tossgame';
 import {NavigationContainer} from '@react-navigation/native';
+import DrawerNavigation from './navigation/DrawerNavigation';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="LoginSignup"
-        screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="AndarBahar" component={AndarBahar} />
-        <Stack.Screen name="LoginSignup" component={LoginSignup} />
-        <Stack.Screen name="Tossgame" component={Tossgame} />
-      </Stack.Navigator>
+      <DrawerNavigation />
     </NavigationContainer>
   );
 };
