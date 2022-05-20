@@ -7,6 +7,7 @@ import Icon3 from 'react-native-vector-icons/Feather';
 import Home from '../src/Home';
 import Profile from '../src/Profile';
 import ReferEarn from '../src/Refer&Earn';
+import {color} from 'react-native-reanimated';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,6 +16,8 @@ const BottomTabs = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        tabBarActiveBackgroundColor: '#001f26',
+        tabBarInactiveBackgroundColor: '#001f26',
       }}>
       <Tab.Screen
         name="Home"

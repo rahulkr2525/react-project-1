@@ -6,6 +6,8 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import {DrawerContent} from './Drawercontent';
 import Wallet from '../src/Wallet';
 import BottomTabs from './BottomTabs';
+import StackNavigator from './StackNavigator';
+import Tossgame from '../src/Tossgame';
 
 const Drawer = createDrawerNavigator();
 
@@ -17,6 +19,8 @@ const DrawerNavigation = ({navigation, route}) => {
       }}
       drawerContent={props => <DrawerContent navigation {...props} />}>
       <Drawer.Screen name="Tabs" component={BottomTabs} />
+      <Drawer.Screen name="StackNavigator" component={StackNavigator} />
+      <Drawer.Screen name="Tossgame" component={Tossgame} />
     </Drawer.Navigator>
   );
 };
