@@ -47,7 +47,7 @@ const Tossgame = () => {
   const getfirstData = async () => {
     try {
       const response = await axios.get(
-        'http://192.168.0.103:4000/api/v1/started',
+        'https://andarbahar65435.herokuapp.com/api/v1/started',
       );
       setData(response.data.game);
       setRandomValueHead(response.data.game.randomvaluehead);
@@ -131,7 +131,7 @@ const Tossgame = () => {
           // Timer done
           clearInterval(winnerTimer);
           const winner = await axios.get(
-            'http://192.168.0.103:4000/api/v1/winnerdata',
+            'https://andarbahar65435.herokuapp.com/api/v1/winnerdata',
           );
           setCurrentWinner(winner.data);
 
@@ -196,7 +196,7 @@ const Tossgame = () => {
 
         const isPut = await axios({
           method: 'POST',
-          url: 'http://192.168.0.103:4000/api/v1/money',
+          url: 'https://andarbahar65435.herokuapp.com/api/v1/money',
           data: body,
         });
         console.log(isPut);

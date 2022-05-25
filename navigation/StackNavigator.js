@@ -11,6 +11,8 @@ import DrawerNavigation from './DrawerNavigation';
 import AndarBahar from '../src/AndarBahar';
 import LoginSignup from '../src/LoginSignUp';
 import Tossgame from '../src/Tossgame';
+import Parity from '../src/Parity';
+import BottomTabs from './BottomTabs';
 
 const Stack = createStackNavigator();
 
@@ -21,9 +23,11 @@ const StackNavigator = () => {
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Dashboard" component={DrawerNavigation} />
+      <Stack.Screen name="BottomTabs" component={BottomTabs} />
       <Stack.Screen name="AndarBahar" component={AndarBahar} />
       <Stack.Screen name="LoginSignup" component={LoginSignup} />
       <Stack.Screen name="Tossgame" component={Tossgame} />
+      <Stack.Screen name="Parity" component={Parity} />
     </Stack.Navigator>
   );
 };
