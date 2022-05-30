@@ -9,40 +9,73 @@ import {
   Pressable,
   Animated,
   Modal,
+  ScrollView,
 } from 'react-native';
 import axios from 'axios';
 import {dimension, widthToDp} from './utils';
 import {RFValue} from 'react-native-responsive-fontsize';
 import LinearGradient from 'react-native-linear-gradient';
+import Snackbar from 'react-native-snackbar';
+import R2 from '../images/R2.png';
+import R4 from '../images/R4.png';
+import R6 from '../images/R6.png';
+import R8 from '../images/R8.png';
+import G1 from '../images/G1.png';
+import G3 from '../images/G3.png';
+import G7 from '../images/G7.png';
+import G9 from '../images/G9.png';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {color} from 'react-native-reanimated';
+
 const Parity = () => {
-  const [lastWinners, setLastWinners] = useState([
-    {color: 'R', number: 1},
-    {color: 'R', number: 1},
-    {color: 'VR', number: 1},
-    {color: 'G', number: 1},
-    {color: 'R', number: 1},
-    {color: 'G', number: 1},
-    {color: 'R', number: 1},
-    {color: 'R', number: 1},
-  ]);
+  const [lastWinners, setLastWinners] = useState([]);
   const [winnerColor, setWinnerColor] = useState();
   const [selectedValue, setSelectedValue] = useState();
   const [selectedAmount, setSelectedAmount] = useState(0);
-  const [modalVisible, setModalVisible] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [second, setSecond] = useState(null);
+  const [fivetimer, setFivetimer] = useState(5);
+  const [minute, setMinute] = useState(null);
+  const [hour, setHour] = useState(null);
+  const [winnerinterval, setWinnerInterval] = useState(2);
+  const [days, setDays] = useState(null);
+  const [data, setData] = useState();
+  const [winner, setWinner] = useState(false);
+  const [winnerPhoto, setWinnerPhoto] = useState();
+  const [winnerModal, setwinnerModal] = useState(false);
+  const [wallet, setWallet] = useState(0);
+  const [newWinner, setNewWinner] = useState();
+  const [myParityRecord, setMyParityRecord] = useState([]);
+  const [recordSelected, setRecordSelected] = useState(true);
+
   useEffect(() => {
     getfirstData();
   }, []);
+
   const getfirstData = async () => {
     try {
-      const response = await axios.get(
-        'https://andarbahar65435.herokuapp.com/api/v1/paritystarted',
-      );
-      setData(response.data.game);
+      const data = {
+        email: 'rahulbisht683@gmail.com',
+      };
+      const wallets = await axios({
+        method: 'POST',
+        url: 'http://192.168.1.42:4000/api/v1/findUser',
+        data: data,
+      });
+      setWallet(wallets.data[0].Wallet);
+      console.log(wallet);
+      setMyParityRecord(wallets.data[0].ParityRecord);
+      console.log('ddeeewwsddwescacac', myParityRecord);
 
+      const response = await axios.get(
+        'http://192.168.1.42:4000/api/v1/paritystarted',
+      );
+      //setData(response.data.game);
+      //console.log('data', response.data.game.lastWinners[1]);
+
+      //console.log('haa mai hi hoo', winnerPhoto);
       //console.log(winner.data);
-      console.log(response.data.game.lastWinners);
+      //console.log(response.data.game.lastWinners);
       // const ss = new Date(Date.now());
       // console.log(ss.toDateString(), ss.toTimeString());
       //timeBetweenDates();
@@ -67,8 +100,24 @@ const Parity = () => {
         //console.log(new Date(difference).toTimeString());
 
         if (difference <= 0) {
-          setLastWinners(response.data.game.lastWinners);
+          // setLastWinners({
+          //   color: 'R',
+          //   number: 6,
+          //   url: 'https://res.cloudinary.com/dxwtomfzt/image/upload/v1653766842/game/red…',
+          // });
+          for (i = 0; i <= 15; i++) {
+            if (i == 0) {
+              setLastWinners([response.data.game.lastWinners[i]]);
+            } else {
+              setLastWinners(prevState => [
+                ...prevState,
+                response.data.game.lastWinners[i],
+              ]);
+            }
+          }
+
           setWinner(true);
+
           const deppt = setInterval(() => {
             setWinnerInterval(lastWinnerIntervalCount => {
               if (lastWinnerIntervalCount <= 1) {
@@ -116,12 +165,24 @@ const Parity = () => {
         //console.log(new Date(difference).toTimeString());
 
         if (difference <= 0) {
-          // Timer done
           clearInterval(winnerTimer);
-          const winner = await axios.get(
-            'https://andarbahar65435.herokuapp.com/api/v1/winnerdata',
-          );
-          setCurrentWinner(winner.data);
+          // Timer done
+          try {
+            const winner = await axios.get(
+              'http://192.168.1.42:4000/api/v1/paritywinnerdata',
+            );
+            setWinnerPhoto(winner.data[0].url);
+            setNewWinner(winner.data[0]);
+
+            console.log('dddddddddddddddddggtteefvddddd', winner.data[0].color);
+          } catch (error) {
+            console.log(error);
+          }
+
+          // const dummystring = currentWinner.color + currentWinner.number;
+          // dummystring.replace(/[{()}]/g, '');
+          // setWinnerPhoto(dummystring);
+          console.log(winnerPhoto);
 
           //Result Timer
         } else {
@@ -152,11 +213,14 @@ const Parity = () => {
   //   };
 
   const fivesecTimerfnc = async () => {
+    setwinnerModal(true);
     const depp = setInterval(() => {
       setFivetimer(lastFivetimerCount => {
         if (lastFivetimerCount <= 1) {
           clearInterval(depp);
+          setwinnerModal(false);
           getfirstData();
+          setFivetimer(5);
         }
 
         return lastFivetimerCount - 1;
@@ -184,16 +248,40 @@ const Parity = () => {
 
         const isPut = await axios({
           method: 'POST',
-          url: 'https://andarbahar65435.herokuapp.com/api/v1/paritymoney',
+          url: 'http://192.168.1.42:4000/api/v1/paritymoney',
           data: body,
         });
-        console.log(isPut);
+
+        if (isPut.data == 'ok') {
+          var body = {
+            email: 'rahulbisht683@gmail.com',
+            roundid: data.roundid,
+            placed: selectedValue,
+            amount: selectedAmount,
+          };
+          const save = await axios({
+            method: 'POST',
+            url: 'http://192.168.1.42:4000/api/v1/setmoney',
+            data: body,
+          });
+          setWallet(wallet - money);
+          set;
+        }
+        Snackbar.show({
+          text: isPut.data,
+          duration: Snackbar.LENGTH_LONG,
+        });
+        console.log(isPut.data);
       } catch (error) {
-        console.log(error);
+        //console.log(error);
       }
     } else {
       console.log('deposit time went');
-      console.log(data.depositEndTime);
+      // console.log(data.depositEndTime);
+      Snackbar.show({
+        text: 'Wait for next round',
+        duration: Snackbar.LENGTH_INDEFINITE,
+      });
     }
   };
 
@@ -220,6 +308,52 @@ const Parity = () => {
         style={{
           flex: 1,
         }}>
+        <Modal visible={winnerModal} transparent={true} animationType={'fade'}>
+          <View
+            style={{
+              height: dimension.height,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0,0,0,0.2)',
+            }}>
+            <View
+              style={{
+                backgroundColor: 'rgba(47, 87, 222,0.2)',
+                height: dimension.height * 0.3,
+                width: dimension.height * 0.3,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 400,
+              }}>
+              <View
+                style={{
+                  backgroundColor: 'rgba(47, 87, 222,0.2)',
+                  height: dimension.height * 0.25,
+                  width: dimension.height * 0.25,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 400,
+                }}>
+                <View
+                  style={{
+                    backgroundColor: 'rgba(47, 87, 222,0.2)',
+                    height: dimension.height * 0.2,
+                    width: dimension.height * 0.2,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 400,
+                  }}>
+                  <Image
+                    source={{uri: winnerPhoto}}
+                    style={{
+                      height: dimension.height * 0.2,
+                      width: dimension.width * 0.4,
+                    }}></Image>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Modal>
         <Modal visible={modalVisible} transparent={true}>
           <View
             style={{
@@ -362,7 +496,6 @@ const Parity = () => {
                   onPress={() => {
                     setSelectedAmount(0);
                   }}
-                  q
                   style={{
                     width: dimension.width * 0.4,
                     paddingVertical: dimension.height * 0.007,
@@ -396,6 +529,10 @@ const Parity = () => {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                  onPress={() => {
+                    moneyPutfnc(selectedValue, selectedAmount);
+                    setModalVisible(false);
+                  }}
                   style={{
                     marginLeft: dimension.width * 0.04,
                     marginRight: dimension.width * 0.06,
@@ -443,7 +580,7 @@ const Parity = () => {
                 paddingLeft: dimension.width * 0.01,
                 color: 'white',
               }}>
-              ₹100
+              {wallet}
             </Text>
           </View>
         </View>
@@ -561,7 +698,7 @@ const Parity = () => {
                     borderRadius: 5,
                     color: 'black',
                   }}>
-                  2
+                  {minute}
                 </Text>
                 <Text
                   style={{
@@ -587,22 +724,7 @@ const Parity = () => {
                     borderRadius: 5,
                     color: 'black',
                   }}>
-                  3
-                </Text>
-                <Text
-                  style={{
-                    fontSize: RFValue(23),
-                    fontWeight: '400',
-                    paddingHorizontal: 2,
-                    marginTop: dimension.height * 0.02,
-                    textAlign: 'center',
-                    marginLeft: dimension.width * 0.01,
-                    backgroundColor: 'rgba(0,0,0,0.3)',
-                    borderRadius: 5,
-
-                    color: 'black',
-                  }}>
-                  0
+                  {second}
                 </Text>
               </View>
             </View>
@@ -947,176 +1069,371 @@ const Parity = () => {
             </View>
           </View>
         </View>
+
         <View
           style={{
             height: dimension.height * 0.6,
             backgroundColor: 'white',
             alignItems: 'center',
           }}>
-          <Icon
-            style={{
-              color: 'rgba(125, 130, 130,0.7)',
-              marginTop: dimension.height * 0.01,
-            }}
-            name="ios-trophy-sharp"
-            size={24}
-          />
-          <Text
-            style={{
-              fontSize: RFValue(15),
-              fontWeight: '800',
-              width: dimension.width,
-              paddingBottom: dimension.height * 0.01,
-              borderBottomColor: 'blue',
-              borderBottomWidth: 2,
-              color: 'rgba(125, 130, 130,0.7)',
-              textAlign: 'center',
-              letterSpacing: 0.1,
-            }}>
-            Parity Record
-          </Text>
           <View
             style={{
               flexDirection: 'row',
-              paddingHorizontal: dimension.width * 0.04,
-
-              paddingVertical: dimension.height * 0.02,
-              width: dimension.width,
-              borderBottomColor: 'rgba(125, 130, 130,0.5)',
-              borderBottomWidth: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
-            <View
+            <TouchableOpacity
+              onPress={() => {
+                setRecordSelected(true);
+              }}
               style={{
-                width: dimension.width * 0.25,
                 alignItems: 'center',
-                height: '100%',
+                justifyContent: 'center',
+                width: dimension.width * 0.5,
               }}>
+              <Icon
+                style={{
+                  color: recordSelected ? 'blue' : 'rgba(125, 130, 130,0.7)',
+                  marginTop: dimension.height * 0.01,
+                }}
+                name="ios-trophy-sharp"
+                size={24}
+              />
               <Text
                 style={{
-                  fontSize: RFValue(12),
+                  fontSize: RFValue(15),
+                  fontWeight: '800',
+                  width: '100%',
+                  paddingBottom: dimension.height * 0.01,
+                  borderBottomColor: 'blue',
+                  borderBottomWidth: 2,
                   color: 'rgba(125, 130, 130,0.7)',
+                  textAlign: 'center',
+                  letterSpacing: 0.1,
                 }}>
-                Period
+                Parity Record
               </Text>
-            </View>
-            <View
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setRecordSelected(false);
+              }}
               style={{
-                width: dimension.width * 0.22,
                 alignItems: 'center',
-                height: '100%',
+                justifyContent: 'center',
+                width: dimension.width * 0.5,
               }}>
+              <Icon
+                style={{
+                  color: recordSelected ? 'rgba(125, 130, 130,0.7)' : 'blue',
+                  marginTop: dimension.height * 0.01,
+                }}
+                name="ios-trophy-sharp"
+                size={24}
+              />
               <Text
                 style={{
-                  fontSize: RFValue(12),
+                  fontSize: RFValue(15),
+                  fontWeight: '800',
+                  width: '100%',
+                  paddingBottom: dimension.height * 0.01,
+                  borderBottomColor: 'blue',
+                  borderBottomWidth: 2,
                   color: 'rgba(125, 130, 130,0.7)',
+                  textAlign: 'center',
+                  letterSpacing: 0.1,
                 }}>
-                Price
+                My Parity Record
               </Text>
-            </View>
-            <View
-              style={{
-                width: dimension.width * 0.22,
-                alignItems: 'center',
-                height: '100%',
-              }}>
-              <Text
-                style={{
-                  fontSize: RFValue(12),
-                  color: 'rgba(125, 130, 130,0.7)',
-                }}>
-                Number
-              </Text>
-            </View>
-            <View
-              style={{
-                width: dimension.width * 0.22,
-                alignItems: 'center',
-                height: '100%',
-              }}>
-              <Text
-                style={{
-                  fontSize: RFValue(12),
-                  color: 'rgba(125, 130, 130,0.7)',
-                }}>
-                Result
-              </Text>
-            </View>
+            </TouchableOpacity>
           </View>
-          <FlatList
-            data={lastWinners}
-            keyExtractor={(item, index) => `key${index}`}
-            renderItem={({item}) => (
+          {recordSelected ? (
+            <>
               <View
                 style={{
-                  width: dimension.width,
-                  paddingHorizontal: dimension.width * 0.04,
-                  paddingVertical: dimension.height * 0.02,
-                  borderBottomColor: 'rgba(125, 130, 130,0.7)',
                   flexDirection: 'row',
+                  paddingHorizontal: dimension.width * 0.04,
+
+                  paddingVertical: dimension.height * 0.02,
+                  width: dimension.width,
+                  borderBottomColor: 'rgba(125, 130, 130,0.5)',
                   borderBottomWidth: 1,
                 }}>
-                <Text
-                  style={{
-                    width: dimension.width * 0.25,
-                    textAlign: 'center',
-
-                    height: '100%',
-                    color: 'black',
-                  }}>
-                  {lastWinners.indexOf(item) + 1}
-                </Text>
-                <Text
-                  style={{
-                    width: dimension.width * 0.22,
-                    textAlign: 'center',
-
-                    height: '100%',
-                    color: 'black',
-                  }}>
-                  1000
-                </Text>
-                <Text
-                  style={{
-                    width: dimension.width * 0.22,
-                    textAlign: 'center',
-
-                    height: '100%',
-                    color: item.color == 'R' ? 'red' : 'green',
-                  }}>
-                  {item.number}
-                </Text>
                 <View
                   style={{
-                    flexDirection: 'row',
+                    width: dimension.width * 0.25,
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: RFValue(12),
+                      color: 'rgba(125, 130, 130,0.7)',
+                    }}>
+                    Period
+                  </Text>
+                </View>
+                <View
+                  style={{
                     width: dimension.width * 0.22,
                     alignItems: 'center',
-                    justifyContent: 'center',
                   }}>
-                  <View
+                  <Text
                     style={{
-                      height: dimension.height * 0.02,
-                      width: dimension.height * 0.02,
-                      borderRadius: 100,
-                      backgroundColor: item.color == 'R' ? 'red' : 'green',
-                    }}></View>
-                  <View
-                    style={{
-                      height: dimension.height * 0.02,
-                      width: dimension.height * 0.02,
-                      borderRadius: 100,
-                      backgroundColor: item.color == 'VR' ? 'violet' : null,
+                      fontSize: RFValue(12),
+                      color: 'rgba(125, 130, 130,0.7)',
                     }}>
-                    <View
-                      style={{
-                        height: dimension.height * 0.02,
-                        width: dimension.height * 0.02,
-                        borderRadius: 100,
-                        backgroundColor: item.color == 'VG' ? 'violet' : null,
-                      }}></View>
-                  </View>
+                    Price
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: dimension.width * 0.22,
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: RFValue(12),
+                      color: 'rgba(125, 130, 130,0.7)',
+                    }}>
+                    Number
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: dimension.width * 0.22,
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: RFValue(12),
+                      color: 'rgba(125, 130, 130,0.7)',
+                    }}>
+                    Result
+                  </Text>
                 </View>
               </View>
-            )}></FlatList>
+
+              <FlatList
+                data={lastWinners}
+                maxToRenderPerBatch={10}
+                keyExtractor={(item, index) => `key${index}`}
+                renderItem={({item}) => (
+                  <View
+                    style={{
+                      width: dimension.width,
+                      paddingHorizontal: dimension.width * 0.04,
+                      paddingVertical: dimension.height * 0.02,
+                      borderBottomColor: 'rgba(125, 130, 130,0.7)',
+                      flexDirection: 'row',
+                      borderBottomWidth: 1,
+                    }}>
+                    <Text
+                      style={{
+                        width: dimension.width * 0.25,
+                        textAlign: 'center',
+
+                        height: '100%',
+                        color: 'black',
+                      }}>
+                      {lastWinners.indexOf(item) + 1}
+                    </Text>
+                    <Text
+                      style={{
+                        width: dimension.width * 0.22,
+                        textAlign: 'center',
+
+                        height: '100%',
+                        color: 'black',
+                      }}>
+                      1000
+                    </Text>
+                    <Text
+                      style={{
+                        width: dimension.width * 0.22,
+                        textAlign: 'center',
+
+                        height: '100%',
+                        color: item.color == 'R' ? 'red' : 'green',
+                      }}>
+                      {item.number}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        width: dimension.width * 0.22,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <View
+                        style={{
+                          height: dimension.height * 0.02,
+                          width: dimension.height * 0.02,
+                          borderRadius: 100,
+                          backgroundColor: item.color == 'R' ? 'red' : 'green',
+                        }}></View>
+                      <View
+                        style={{
+                          height: dimension.height * 0.02,
+                          width: dimension.height * 0.02,
+                          borderRadius: 100,
+                          backgroundColor: item.color == 'VR' ? 'violet' : null,
+                        }}>
+                        <View
+                          style={{
+                            height: dimension.height * 0.02,
+                            width: dimension.height * 0.02,
+                            borderRadius: 100,
+                            backgroundColor:
+                              item.color == 'VG' ? 'violet' : null,
+                          }}></View>
+                      </View>
+                    </View>
+                  </View>
+                )}></FlatList>
+            </>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  paddingHorizontal: dimension.width * 0.04,
+
+                  paddingVertical: dimension.height * 0.02,
+                  width: dimension.width,
+                  borderBottomColor: 'rgba(125, 130, 130,0.5)',
+                  borderTopColor: 'rgba(125, 130, 130,0.5)',
+                  borderBottomWidth: 1,
+                  borderTopWidth: 1,
+                }}>
+                <View
+                  style={{
+                    width: dimension.width * 0.25,
+                    alignItems: 'center',
+                    height: '100%',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: RFValue(12),
+                      color: 'rgba(125, 130, 130,0.7)',
+                    }}>
+                    Period
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: dimension.width * 0.22,
+                    alignItems: 'center',
+                    height: '100%',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: RFValue(12),
+                      color: 'rgba(125, 130, 130,0.7)',
+                    }}>
+                    Amount
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: dimension.width * 0.22,
+                    alignItems: 'center',
+                    height: '100%',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: RFValue(12),
+                      color: 'rgba(125, 130, 130,0.7)',
+                    }}>
+                    Status
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: dimension.width * 0.22,
+                    alignItems: 'center',
+                    height: '100%',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: RFValue(12),
+                      color: 'rgba(125, 130, 130,0.7)',
+                    }}>
+                    Result
+                  </Text>
+                </View>
+              </View>
+              <FlatList
+                data={myParityRecord}
+                maxToRenderPerBatch={10}
+                keyExtractor={(item, index) => `key${index}`}
+                renderItem={({item}) => (
+                  <View
+                    style={{
+                      width: dimension.width,
+                      paddingHorizontal: dimension.width * 0.04,
+                      paddingVertical: dimension.height * 0.02,
+                      borderBottomColor: 'rgba(125, 130, 130,0.7)',
+                      flexDirection: 'row',
+                      borderBottomWidth: 1,
+                    }}>
+                    <Text
+                      style={{
+                        width: dimension.width * 0.25,
+                        textAlign: 'center',
+                        fontSize: RFValue(10),
+                        height: '100%',
+                        color: 'black',
+                      }}>
+                      {item.roundid}
+                    </Text>
+                    <Text
+                      style={{
+                        width: dimension.width * 0.22,
+                        textAlign: 'center',
+
+                        height: '100%',
+                        color: 'black',
+                      }}>
+                      {item.amount}
+                    </Text>
+                    <Text
+                      style={{
+                        width: dimension.width * 0.22,
+                        textAlign: 'center',
+
+                        height: '100%',
+                        color: 'black',
+                      }}>
+                      {item.status ? item.status : '-' + item.amount}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        width: dimension.width * 0.22,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <View
+                        style={{
+                          height: dimension.height * 0.02,
+                          width: dimension.height * 0.02,
+                          borderRadius: 100,
+                          backgroundColor:
+                            item.placed == 'RED' ? 'red' : 'green',
+                        }}></View>
+                      <View
+                        style={{
+                          height: dimension.height * 0.02,
+                          width: dimension.height * 0.02,
+                          borderRadius: 100,
+                          backgroundColor:
+                            item.placed == 'VIOLET' ? 'violet' : null,
+                        }}></View>
+                    </View>
+                  </View>
+                )}></FlatList>
+            </>
+          )}
         </View>
       </View>
     </>

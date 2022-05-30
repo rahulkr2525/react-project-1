@@ -169,6 +169,7 @@ const Tossgame = () => {
         if (lastFivetimerCount <= 1) {
           clearInterval(depp);
           getfirstData();
+          setFivetimer(5);
         }
 
         return lastFivetimerCount - 1;
