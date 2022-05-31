@@ -73,7 +73,7 @@ const Home = ({navigation, route}) => {
               overflow: 'hidden',
             }}>
             <Image
-              source={require('../images/images.jpg')}
+              source={require('../images/unnamed1.png')}
               style={{
                 height: dimension.height * 0.3,
                 resizeMode: 'cover',

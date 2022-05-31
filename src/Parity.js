@@ -29,7 +29,7 @@ import {color} from 'react-native-reanimated';
 
 const Parity = () => {
   const [lastWinners, setLastWinners] = useState([]);
-  const [winnerColor, setWinnerColor] = useState();
+  const [roundid, setRoundID] = useState();
   const [selectedValue, setSelectedValue] = useState();
   const [selectedAmount, setSelectedAmount] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
@@ -47,6 +47,7 @@ const Parity = () => {
   const [newWinner, setNewWinner] = useState();
   const [myParityRecord, setMyParityRecord] = useState([]);
   const [recordSelected, setRecordSelected] = useState(true);
+  const [depositEndTime, setDepositEndTime] = useState();
 
   useEffect(() => {
     getfirstData();
@@ -65,7 +66,8 @@ const Parity = () => {
       setWallet(wallets.data[0].Wallet);
       console.log(wallet);
       setMyParityRecord(wallets.data[0].ParityRecord);
-      console.log('ddeeewwsddwescacac', myParityRecord);
+      setRoundID(wallets.data[0].roundid);
+      console.log('ddeeewwsddwescacac', wallets.data[0].ParityRecord);
 
       const response = await axios.get(
         'http://192.168.1.42:4000/api/v1/paritystarted',
@@ -79,6 +81,7 @@ const Parity = () => {
       // const ss = new Date(Date.now());
       // console.log(ss.toDateString(), ss.toTimeString());
       //timeBetweenDates();
+      setDepositEndTime(response.data.game.depositEndTime);
       var timer = setInterval(function () {
         timeBetweenDates();
       }, 1000);
@@ -87,41 +90,47 @@ const Parity = () => {
       }, 1000);
 
       const timeBetweenDates = async toDate => {
-        var dateEntered = new Date(response.data.game.currentRound).getTime();
+        var dateEntered = await new Date(
+          response.data.game.currentRound,
+        ).getTime();
         dateEntered += 2 * 60 * 1000;
-        dateEntered += 30 * 1000;
+        dateEntered += 35 * 1000;
 
         //console.log(new Date(dateEntered).toTimeString());
 
         var now = new Date(Date.now());
         // console.log(now);
-        var difference = new Date(dateEntered).getTime() - now.getTime();
+        var difference =
+          (await new Date(dateEntered).getTime()) - now.getTime();
 
         //console.log(new Date(difference).toTimeString());
 
         if (difference <= 0) {
+          clearInterval(timer);
           // setLastWinners({
           //   color: 'R',
           //   number: 6,
           //   url: 'https://res.cloudinary.com/dxwtomfzt/image/upload/v1653766842/game/red…',
           // });
-          for (i = 0; i <= 15; i++) {
-            if (i == 0) {
-              setLastWinners([response.data.game.lastWinners[i]]);
-            } else {
-              setLastWinners(prevState => [
-                ...prevState,
-                response.data.game.lastWinners[i],
-              ]);
-            }
-          }
+          // setLastWinners([
+          //   {
+          //     color: 'R',
+          //     number: 8,
+          //     url: 'https://res.cloudinary.com/dxwtomfzt/image/upload/v1653766847/game/red…',
+          //   },
+          // ]);
+          setLastWinners(response.data.game.lastWinners);
+          // for (i = 0; i <= 15; i++) {
+          //   setLastWinners(prevState => [
+          //     ...prevState,
+          //     response.data.game.lastWinners[i],
+          //   ]);
+          // }
+          console.log(lastWinners);
 
-          setWinner(true);
-
-          const deppt = setInterval(() => {
+          const deppt = setInterval(function () {
             setWinnerInterval(lastWinnerIntervalCount => {
               if (lastWinnerIntervalCount <= 1) {
-                setWinner(false);
                 clearInterval(deppt);
                 setWinnerInterval(2);
               }
@@ -131,7 +140,6 @@ const Parity = () => {
           }, 1000);
           // Timer done
 
-          clearInterval(timer);
           fivesecTimerfnc();
 
           //Result Timer
@@ -153,14 +161,17 @@ const Parity = () => {
       };
 
       const winnerLogic = async toDate => {
-        var dateEntered = new Date(response.data.game.currentRound).getTime();
+        var dateEntered = await new Date(
+          response.data.game.currentRound,
+        ).getTime();
         dateEntered += 2 * 60 * 1000;
 
         //console.log(new Date(dateEntered).toTimeString());
 
         var now = new Date(Date.now());
         // console.log(now);
-        var difference = new Date(dateEntered).getTime() - now.getTime();
+        var difference =
+          (await new Date(dateEntered).getTime()) - now.getTime();
 
         //console.log(new Date(difference).toTimeString());
 
@@ -214,30 +225,28 @@ const Parity = () => {
 
   const fivesecTimerfnc = async () => {
     setwinnerModal(true);
-    const depp = setInterval(() => {
+    const depp = setInterval(function () {
       setFivetimer(lastFivetimerCount => {
-        if (lastFivetimerCount <= 1) {
-          clearInterval(depp);
-          setwinnerModal(false);
-          getfirstData();
-          setFivetimer(5);
-        }
+        lastFivetimerCount <= 1 && clearInterval(depp);
+        lastFivetimerCount <= 1 && setwinnerModal(false);
+        lastFivetimerCount <= 1 && getfirstData();
 
         return lastFivetimerCount - 1;
       });
     }, 1000);
+    return () => clearInterval(depp);
   };
-  const ffiivvee = () => {
-    if (fivetimer <= 0) {
-      clearInterval(depp);
-    } else {
-      setFivetimer(fivetimer - 1);
-      console.log(fivetimer);
-    }
-  };
+  // const ffiivvee = () => {
+  //   if (fivetimer <= 0) {
+  //     clearInterval(depp);
+  //   } else {
+  //     setFivetimer(fivetimer - 1);
+  //     console.log(fivetimer);
+  //   }
+  // };
 
   const moneyPutfnc = async (value, money) => {
-    if (new Date(data.depositEndTime) >= new Date(Date.now())) {
+    if (new Date(depositEndTime) >= new Date(Date.now())) {
       console.log(value);
 
       try {
@@ -255,7 +264,7 @@ const Parity = () => {
         if (isPut.data == 'ok') {
           var body = {
             email: 'rahulbisht683@gmail.com',
-            roundid: data.roundid,
+            roundid: roundid,
             placed: selectedValue,
             amount: selectedAmount,
           };
@@ -1364,7 +1373,6 @@ const Parity = () => {
               </View>
               <FlatList
                 data={myParityRecord}
-                maxToRenderPerBatch={10}
                 keyExtractor={(item, index) => `key${index}`}
                 renderItem={({item}) => (
                   <View

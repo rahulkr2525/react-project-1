@@ -28,7 +28,7 @@ const LoginSignup = ({navigation, route}) => {
 
       const response = await axios({
         method: 'POST',
-        url: 'http://192.168.1.5:4000/api/v1/login',
+        url: 'http://192.168.1.42:4000/api/v1/login',
         data: datas,
       });
       console.log('gg', response.data.result);
@@ -53,7 +53,7 @@ const LoginSignup = ({navigation, route}) => {
 
       const response = await axios({
         method: 'POST',
-        url: 'http://192.168.25.169:4000/api/v1/signup',
+        url: 'http://192.168.1.42:4000/api/v1/signup',
         data: data,
       });
       console.log('gg', response);

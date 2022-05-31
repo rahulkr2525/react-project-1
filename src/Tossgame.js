@@ -68,7 +68,7 @@ const Tossgame = () => {
 
       const timeBetweenDates = async toDate => {
         var dateEntered = new Date(response.data.game.currentRound).getTime();
-        dateEntered += 15 * 1000;
+        dateEntered += 17 * 1000;
 
         //console.log(new Date(dateEntered).toTimeString());
 
@@ -81,17 +81,18 @@ const Tossgame = () => {
         if (difference <= 0) {
           setLastWinners(response.data.game.lastWinners);
           setWinner(true);
-          const deppt = setInterval(() => {
-            setWinnerInterval(lastWinnerIntervalCount => {
-              if (lastWinnerIntervalCount <= 1) {
-                setWinner(false);
-                clearInterval(deppt);
-                setWinnerInterval(2);
-              }
+          // const deppt = setInterval(function () {
+          //   setWinnerInterval(lastWinnerIntervalCount => {
+          //     if (lastWinnerIntervalCount <= 1) {
+          //       setWinner(false);
+          //       clearInterval(deppt);
+          //       setWinnerInterval(2);
+          //     }
 
-              return lastWinnerIntervalCount - 1;
-            });
-          }, 1000);
+          //     return lastWinnerIntervalCount - 1;
+          //   });
+          // }, 1000);
+          // clearInterval(deppt);
           // Timer done
 
           clearInterval(timer);
@@ -114,6 +115,8 @@ const Tossgame = () => {
           setDays(days);
         }
       };
+      //return () => clearInterval(timer);
+      //clearInterval(timer);
 
       const winnerLogic = async toDate => {
         var dateEntered = new Date(response.data.game.currentRound).getTime();
@@ -152,6 +155,7 @@ const Tossgame = () => {
           // setDays(days);
         }
       };
+      //return () => clearInterval(winnerTimer);
     } catch (error) {
       console.log(error);
     }
@@ -164,26 +168,24 @@ const Tossgame = () => {
   };
 
   const fivesecTimerfnc = async () => {
-    const depp = setInterval(() => {
+    const depp = setInterval(function () {
       setFivetimer(lastFivetimerCount => {
-        if (lastFivetimerCount <= 1) {
-          clearInterval(depp);
-          getfirstData();
-          setFivetimer(5);
-        }
+        lastFivetimerCount <= 1 && clearInterval(depp);
+        lastFivetimerCount <= 1 && getfirstData();
 
         return lastFivetimerCount - 1;
       });
     }, 1000);
+    return () => clearInterval(depp);
   };
-  const ffiivvee = () => {
-    if (fivetimer <= 0) {
-      clearInterval(depp);
-    } else {
-      setFivetimer(fivetimer - 1);
-      console.log(fivetimer);
-    }
-  };
+  // const ffiivvee = () => {
+  //   if (fivetimer <= 0) {
+  //     clearInterval(depp);
+  //   } else {
+  //     setFivetimer(fivetimer - 1);
+  //     console.log(fivetimer);
+  //   }
+  // };
 
   const moneyPutfnc = async value => {
     if (new Date(data.depositEndTime) >= new Date(Date.now())) {

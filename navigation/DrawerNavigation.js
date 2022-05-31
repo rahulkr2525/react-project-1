@@ -4,11 +4,12 @@ import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 
 import {DrawerContent} from './Drawercontent';
-import Wallet from '../src/Wallet';
+
 import BottomTabs from './BottomTabs';
-import StackNavigator from './StackNavigator';
+
 import Tossgame from '../src/Tossgame';
 import Parity from '../src/Parity';
+import LoginSignup from '../src/LoginSignUp';
 
 const Drawer = createDrawerNavigator();
 
@@ -19,10 +20,10 @@ const DrawerNavigation = ({navigation, route}) => {
         headerShown: false,
       }}
       drawerContent={props => <DrawerContent navigation {...props} />}>
+      <Drawer.Screen name="LoginSignup" component={LoginSignup} />
       <Drawer.Screen name="Parity" component={Parity} />
-      <Drawer.Screen name="Tabs" component={BottomTabs} />
-      <Drawer.Screen name="StackNavigator" component={StackNavigator} />
       <Drawer.Screen name="Tossgame" component={Tossgame} />
+      <Drawer.Screen name="Home" component={BottomTabs} />
     </Drawer.Navigator>
   );
 };
