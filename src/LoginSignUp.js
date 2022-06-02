@@ -28,12 +28,12 @@ const LoginSignup = ({navigation, route}) => {
 
       const response = await axios({
         method: 'POST',
-        url: 'http://192.168.1.42:4000/api/v1/login',
+        url: 'https://andarbahar65435.herokuapp.com/api/v1/login',
         data: datas,
       });
       console.log('gg', response.data.result);
       if (response.data.token) {
-        navigation.navigate('Home');
+        navigation.navigate('Dashboard');
       }
       //console.log('gg', response.data.token);
     } catch (error) {
@@ -53,7 +53,7 @@ const LoginSignup = ({navigation, route}) => {
 
       const response = await axios({
         method: 'POST',
-        url: 'http://192.168.1.42:4000/api/v1/signup',
+        url: 'https://andarbahar65435.herokuapp.com/api/v1/signup',
         data: data,
       });
       console.log('gg', response);

@@ -23,7 +23,7 @@ const DrawerNavigation = ({navigation, route}) => {
       <Drawer.Screen name="LoginSignup" component={LoginSignup} />
       <Drawer.Screen name="Parity" component={Parity} />
       <Drawer.Screen name="Tossgame" component={Tossgame} />
-      <Drawer.Screen name="Home" component={BottomTabs} />
+      <Drawer.Screen name="Dashboard" component={BottomTabs} />
     </Drawer.Navigator>
   );
 };

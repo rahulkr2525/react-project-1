@@ -101,7 +101,7 @@ const Home = ({navigation, route}) => {
                     color: 'rgba(255,255,255,0.7)',
                     letterSpacing: 1,
                   }}>
-                  AndarBahar
+                  Parity
                 </Text>
                 <Text
                   style={{
@@ -114,7 +114,7 @@ const Home = ({navigation, route}) => {
               </View>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate('Tossgame');
+                  navigation.navigate('Parity');
                 }}>
                 <View
                   style={{
@@ -168,7 +168,7 @@ const Home = ({navigation, route}) => {
                   width: '90%',
                   borderRadius: 5,
                 }}
-                source={require('../images/wingo.jpg')}></Image>
+                source={require('../images/andarbahar.png')}></Image>
               <View
                 style={{
                   height: dimension.height * 0.1,
@@ -185,7 +185,7 @@ const Home = ({navigation, route}) => {
                     marginTop: dimension.height * 0.009,
                     paddingLeft: 3,
                   }}>
-                  Win Go
+                  AndarBahar
                 </Text>
                 <Text
                   style={{
@@ -196,6 +196,7 @@ const Home = ({navigation, route}) => {
                   }}>
                   hit and win big
                 </Text>
+                <TouchableOpacity onPress={()=> navigation.navigate("Tossgame")}>
                 <View
                   style={{
                     height: dimension.height * 0.04,
@@ -218,6 +219,7 @@ const Home = ({navigation, route}) => {
                     Play Now
                   </Text>
                 </View>
+                </TouchableOpacity>
               </View>
             </View>
             <View

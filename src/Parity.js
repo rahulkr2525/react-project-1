@@ -60,17 +60,17 @@ const Parity = () => {
       };
       const wallets = await axios({
         method: 'POST',
-        url: 'http://192.168.1.42:4000/api/v1/findUser',
+        url: 'https://andarbahar65435.herokuapp.com/api/v1/findUser',
         data: data,
       });
       setWallet(wallets.data[0].Wallet);
       console.log(wallet);
       setMyParityRecord(wallets.data[0].ParityRecord);
-      setRoundID(wallets.data[0].roundid);
+      
       console.log('ddeeewwsddwescacac', wallets.data[0].ParityRecord);
 
       const response = await axios.get(
-        'http://192.168.1.42:4000/api/v1/paritystarted',
+        'https://andarbahar65435.herokuapp.com/api/v1/paritystarted',
       );
       //setData(response.data.game);
       //console.log('data', response.data.game.lastWinners[1]);
@@ -82,6 +82,7 @@ const Parity = () => {
       // console.log(ss.toDateString(), ss.toTimeString());
       //timeBetweenDates();
       setDepositEndTime(response.data.game.depositEndTime);
+      setRoundID(response.data.game.roundid);
       var timer = setInterval(function () {
         timeBetweenDates();
       }, 1000);
@@ -106,7 +107,7 @@ const Parity = () => {
         //console.log(new Date(difference).toTimeString());
 
         if (difference <= 0) {
-          clearInterval(timer);
+          
           // setLastWinners({
           //   color: 'R',
           //   number: 6,
@@ -128,18 +129,8 @@ const Parity = () => {
           // }
           console.log(lastWinners);
 
-          const deppt = setInterval(function () {
-            setWinnerInterval(lastWinnerIntervalCount => {
-              if (lastWinnerIntervalCount <= 1) {
-                clearInterval(deppt);
-                setWinnerInterval(2);
-              }
-
-              return lastWinnerIntervalCount - 1;
-            });
-          }, 1000);
           // Timer done
-
+          clearInterval(timer);
           fivesecTimerfnc();
 
           //Result Timer
@@ -180,7 +171,7 @@ const Parity = () => {
           // Timer done
           try {
             const winner = await axios.get(
-              'http://192.168.1.42:4000/api/v1/paritywinnerdata',
+              'https://andarbahar65435.herokuapp.com/api/v1/paritywinnerdata',
             );
             setWinnerPhoto(winner.data[0].url);
             setNewWinner(winner.data[0]);
@@ -254,10 +245,10 @@ const Parity = () => {
           amount: money,
           placed: value,
         };
-
+        if(wallet >= money) {
         const isPut = await axios({
           method: 'POST',
-          url: 'http://192.168.1.42:4000/api/v1/paritymoney',
+          url: 'https://andarbahar65435.herokuapp.com/api/v1/paritymoney',
           data: body,
         });
 
@@ -270,28 +261,35 @@ const Parity = () => {
           };
           const save = await axios({
             method: 'POST',
-            url: 'http://192.168.1.42:4000/api/v1/setmoney',
+            url: 'https://andarbahar65435.herokuapp.com/api/v1/setmoney',
             data: body,
           });
           setWallet(wallet - money);
           set;
         }
-        Snackbar.show({
+        await Snackbar.show({
           text: isPut.data,
           duration: Snackbar.LENGTH_LONG,
         });
         console.log(isPut.data);
+      }else {
+        await Snackbar.show({
+          text: 'Dosent have enough money',
+          duration: Snackbar.LENGTH_LONG,
+        });
+      }
       } catch (error) {
         //console.log(error);
       }
     } else {
       console.log('deposit time went');
       // console.log(data.depositEndTime);
-      Snackbar.show({
+      await Snackbar.show({
         text: 'Wait for next round',
-        duration: Snackbar.LENGTH_INDEFINITE,
+        duration: Snackbar.LENGTH_LONG,
       });
     }
+  
   };
 
   //   const selectedColor = (id, amount) => {
@@ -1240,7 +1238,7 @@ const Parity = () => {
                       style={{
                         width: dimension.width * 0.25,
                         textAlign: 'center',
-
+                        fontSize: RFValue(10),
                         height: '100%',
                         color: 'black',
                       }}>
