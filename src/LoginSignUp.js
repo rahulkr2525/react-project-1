@@ -1,12 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import {dimension} from './utils';
 import LinearGradient from 'react-native-linear-gradient';
-import {View, Text, TextInput, TouchableOpacity, Pressable} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, Pressable,Modal} from 'react-native';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import axios from 'axios';
-import {DefaultTransition} from '@react-navigation/stack/lib/typescript/src/TransitionConfigs/TransitionPresets';
+import Sprinkle from "react-native-spinkit"
+import Snackbar from 'react-native-snackbar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginSignup = ({navigation, route}) => {
+ 
   const [placeholder1, setPlaceholder1] = useState(false);
   const [placeholder2, setPlaceholder2] = useState(false);
   const [placeholder3, setPlaceholder3] = useState(false);
@@ -17,8 +20,11 @@ const LoginSignup = ({navigation, route}) => {
   const [email, setEmail] = useState();
   const [phoneno, setPhoneNo] = useState();
   const [password, setPassword] = useState();
+  const [loading, setLoading] = useState(false);
 
   const logIn = async () => {
+   
+    setLoading(true)
     try {
       var datas = {
         email,
@@ -30,18 +36,38 @@ const LoginSignup = ({navigation, route}) => {
         method: 'POST',
         url: 'https://andarbahar65435.herokuapp.com/api/v1/login',
         data: datas,
-      });
-      console.log('gg', response.data.result);
+      })
+      
       if (response.data.token) {
+        const amount = (response.data.result.Wallet)
+        var wallet = amount.toString()
+        await AsyncStorage.setItem('email', response.data.result.email)
+        await AsyncStorage.setItem('wallet', wallet)
+        console.log(wallet)
+        
         navigation.navigate('Dashboard');
+        setLoading(false)
       }
-      //console.log('gg', response.data.token);
-    } catch (error) {
-      console.log(error);
+      
+      console.log('gg', response.data.result.email);
+    } catch (response) {
+      console.log(response);
+     
+      setLoading(false)
+        setTimeout(()=>{
+          Snackbar.show({
+            text: "Username or password dosen't match",
+            duration: Snackbar.LENGTH_LONG,
+          })
+        }, 1000);
+        
+        
+        
     }
   };
 
   const signup = async () => {
+    setLoading(true)
     try {
       var data = {
         name,
@@ -56,11 +82,27 @@ const LoginSignup = ({navigation, route}) => {
         url: 'https://andarbahar65435.herokuapp.com/api/v1/signup',
         data: data,
       });
-      console.log('gg', response);
+      if (response.data.token) {
+        await AsyncStorage.setItem('email', response.data.user.email)
+        await AsyncStorage.setItem('wallet', response.data.user.Wallet)
+        navigation.navigate('Dashboard');
+        setLoading(false)
+      }
+      console.log(response);
+      
     } catch (error) {
       console.log(error);
+      setLoading(false)
+      setTimeout(()=>{
+        Snackbar.show({
+          text: "please check your details",
+          duration: Snackbar.LENGTH_LONG,
+        })
+      }, 1000);
+      
     }
   };
+  
 
   return (
     <>
@@ -69,6 +111,32 @@ const LoginSignup = ({navigation, route}) => {
           height: dimension.height,
           width: dimension.width,
         }}>
+          <Modal transparent = {true}
+          visible = {loading}
+          style={{
+           padding : 1,
+          alignItems : "center",
+          justifyContent : "center",
+            
+          }}>
+            <View
+            style={{
+              height :dimension.height,
+              width : dimension.width,
+              alignItems : "center",
+          justifyContent : "center",
+          backgroundColor : "rgba(0,0,0,0.6)"
+            
+            }}>
+<Sprinkle isVisible={loading} color={'rgba(14, 207, 104,1)'} size={37} type={"Circle"} />
+<Text
+style={{
+  color : "rgba(255,255,255,0.5)",
+  fontSize : RFValue(12)
+}}>Loading</Text>
+</View>
+          </Modal>
+         
         <LinearGradient
           colors={['#282e41', '#227880']}
           style={{
@@ -489,3 +557,4 @@ const LoginSignup = ({navigation, route}) => {
 };
 
 export default LoginSignup;
+

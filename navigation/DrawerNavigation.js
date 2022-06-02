@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React , {useEffect,useState} from 'react';
 
 import {createDrawerNavigator} from '@react-navigation/drawer';
 
@@ -11,11 +11,14 @@ import Tossgame from '../src/Tossgame';
 import Parity from '../src/Parity';
 import LoginSignup from '../src/LoginSignUp';
 
+
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigation = ({navigation, route}) => {
+  
   return (
     <Drawer.Navigator
+
       screenOptions={{
         headerShown: false,
       }}

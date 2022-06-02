@@ -67,7 +67,7 @@ const Parity = () => {
       console.log(wallet);
       setMyParityRecord(wallets.data[0].ParityRecord);
       
-      console.log('ddeeewwsddwescacac', wallets.data[0].ParityRecord);
+      //console.log('ddeeewwsddwescacac', wallets.data[0].ParityRecord);
 
       const response = await axios.get(
         'https://andarbahar65435.herokuapp.com/api/v1/paritystarted',
@@ -121,13 +121,14 @@ const Parity = () => {
           //   },
           // ]);
           setLastWinners(response.data.game.lastWinners);
+          console.log(lastWinners)
           // for (i = 0; i <= 15; i++) {
           //   setLastWinners(prevState => [
           //     ...prevState,
           //     response.data.game.lastWinners[i],
           //   ]);
           // }
-          console.log(lastWinners);
+          //console.log(lastWinners);
 
           // Timer done
           clearInterval(timer);
@@ -216,16 +217,10 @@ const Parity = () => {
 
   const fivesecTimerfnc = async () => {
     setwinnerModal(true);
-    const depp = setInterval(function () {
-      setFivetimer(lastFivetimerCount => {
-        lastFivetimerCount <= 1 && clearInterval(depp);
-        lastFivetimerCount <= 1 && setwinnerModal(false);
-        lastFivetimerCount <= 1 && getfirstData();
-
-        return lastFivetimerCount - 1;
-      });
-    }, 1000);
-    return () => clearInterval(depp);
+    setTimeout(() => {
+      setwinnerModal(false)
+      getfirstData()
+    }, 5000);
   };
   // const ffiivvee = () => {
   //   if (fivetimer <= 0) {
@@ -265,18 +260,22 @@ const Parity = () => {
             data: body,
           });
           setWallet(wallet - money);
-          set;
+          
         }
-        await Snackbar.show({
-          text: isPut.data,
-          duration: Snackbar.LENGTH_LONG,
-        });
+         setTimeout(()=>{
+          Snackbar.show({
+            text: "Amount Placed",
+            duration: Snackbar.LENGTH_LONG,
+          })
+        }, 200)
         console.log(isPut.data);
       }else {
-        await Snackbar.show({
-          text: 'Dosent have enough money',
-          duration: Snackbar.LENGTH_LONG,
-        });
+        setTimeout(()=>{
+          Snackbar.show({
+            text: "Low Wallet Balance",
+            duration: Snackbar.LENGTH_LONG,
+          })
+        }, 1000)
       }
       } catch (error) {
         //console.log(error);
@@ -284,10 +283,12 @@ const Parity = () => {
     } else {
       console.log('deposit time went');
       // console.log(data.depositEndTime);
-      await Snackbar.show({
-        text: 'Wait for next round',
-        duration: Snackbar.LENGTH_LONG,
-      });
+      setTimeout(()=>{
+        Snackbar.show({
+          text: "Wait for next round",
+          duration: Snackbar.LENGTH_LONG,
+        })
+      }, 1000)
     }
   
   };

@@ -15,11 +15,13 @@ const BottomTabs = () => {
   return (
     <Tab.Navigator
       screenOptions={{
+        
         headerShown: false,
         tabBarActiveBackgroundColor: '#001f26',
         tabBarInactiveBackgroundColor: '#001f26',
       }}>
       <Tab.Screen
+      
         name="Home"
         component={Home}
         options={({navigation}) => {

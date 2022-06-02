@@ -1,13 +1,23 @@
-import React, {useState} from 'react';
+import React, {useState,useEffect} from 'react';
 
 import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {dimension} from './utils';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({navigation, route}) => {
+  useEffect(()=> {
+    walletMoney()
+    
+  },[])
   const [wallet, setWallet] = useState(10);
+  const walletMoney= async()=> {
+    const value = await AsyncStorage.removeItem('email')
+    console.log(value)
+    setWallet(value)
+  }
   return (
     <>
       <View
@@ -53,7 +63,7 @@ const Home = ({navigation, route}) => {
               ₹{wallet}
             </Text>
             <Icon
-              onPress={() => navigation.openDrawer()}
+              
               style={{color: 'white', alignSelf: 'center', marginLeft: '10%'}}
               name="add-circle"
               size={26}
