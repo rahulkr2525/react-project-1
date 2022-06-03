@@ -21,9 +21,10 @@ const StackNavigator = () => {
       initialRouteName="LoginSignup"
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="AndarBahar" component={AndarBahar} />
-      <Drawer.Screen name="Parity" component={Parity} />
-      <Drawer.Screen name="Tossgame" component={Tossgame} />
-      <Drawer.Screen name="Dashboard" component={BottomTabs} />
+      <Stack.Screen name="LoginSignup" component={LoginSignup} />
+      <Stack.Screen name="Parity" component={Parity} />
+      <Stack.Screen name="Tossgame" component={Tossgame} />
+      <Stack.Screen name="Dashboard" component={BottomTabs} />
     </Stack.Navigator>
   );
 };

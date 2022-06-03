@@ -9,6 +9,7 @@ import AndarBahar from './src/AndarBahar';
 import LoginSignup from './src/LoginSignUp';
 import Tossgame from './src/Tossgame';
 import {NavigationContainer} from '@react-navigation/native';
+import StackNavigator from './navigation/StackNavigator';
 import DrawerNavigation from './navigation/DrawerNavigation';
 import BottomTabs from './navigation/BottomTabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -42,7 +43,7 @@ const App = () => {
   const [visible , setVisible] = useState()
   return (
     <NavigationContainer>
-      {visible ?( <BottomTabs />):(<DrawerNavigation />) }
+      {visible ?( <DrawerNavigation />):(<StackNavigator />) }
      
       
     </NavigationContainer>

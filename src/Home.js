@@ -14,7 +14,7 @@ const Home = ({navigation, route}) => {
   },[])
   const [wallet, setWallet] = useState(10);
   const walletMoney= async()=> {
-    const value = await AsyncStorage.removeItem('email')
+    const value = await AsyncStorage.getItem('wallet')
     console.log(value)
     setWallet(value)
   }
@@ -63,7 +63,7 @@ const Home = ({navigation, route}) => {
               ₹{wallet}
             </Text>
             <Icon
-              
+              onPress={() => navigation.navigate("Wallet")}
               style={{color: 'white', alignSelf: 'center', marginLeft: '10%'}}
               name="add-circle"
               size={26}

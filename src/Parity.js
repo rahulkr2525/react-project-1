@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-
+import Sound from "react-native-sound"
 import {
   Text,
   View,
@@ -26,6 +26,9 @@ import G7 from '../images/G7.png';
 import G9 from '../images/G9.png';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {color} from 'react-native-reanimated';
+import Sprinkle from "react-native-spinkit"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Parity = () => {
   const [lastWinners, setLastWinners] = useState([]);
@@ -48,15 +51,43 @@ const Parity = () => {
   const [myParityRecord, setMyParityRecord] = useState([]);
   const [recordSelected, setRecordSelected] = useState(true);
   const [depositEndTime, setDepositEndTime] = useState();
+  const [loading, setLoading] = useState(true);
+  const [loadingButton, setLoadingButton] = useState(true);
+  const [userEmail, setUserEmail] = useState();
+ 
 
   useEffect(() => {
     getfirstData();
+    
   }, []);
-
+  
+  const playSound = ( ) => {
+    console.log("ok")
+    var whoosh = new Sound('ttyy.mp3', Sound.MAIN_BUNDLE, (error) => {
+      if (error) {
+        console.log('failed to load the sound', error);
+        return;
+      }else
+      // loaded successfully
+      console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+    
+      // Play the sound with an onEnd callback
+      whoosh.play((success) => {
+        if (success) {
+          console.log('successfully finished playing');
+        } else {
+          console.log('playback failed due to audio decoding errors');
+        }
+      });
+    });
+  }
+ 
   const getfirstData = async () => {
     try {
+      const value = await AsyncStorage.getItem('email')
+      setUserEmail(value)
       const data = {
-        email: 'rahulbisht683@gmail.com',
+        email: value,
       };
       const wallets = await axios({
         method: 'POST',
@@ -65,6 +96,7 @@ const Parity = () => {
       });
       setWallet(wallets.data[0].Wallet);
       console.log(wallet);
+      setLoadingButton(true)
       setMyParityRecord(wallets.data[0].ParityRecord);
       
       //console.log('ddeeewwsddwescacac', wallets.data[0].ParityRecord);
@@ -83,6 +115,7 @@ const Parity = () => {
       //timeBetweenDates();
       setDepositEndTime(response.data.game.depositEndTime);
       setRoundID(response.data.game.roundid);
+      setLastWinners(response.data.game.lastWinners);
       var timer = setInterval(function () {
         timeBetweenDates();
       }, 1000);
@@ -90,12 +123,16 @@ const Parity = () => {
         winnerLogic();
       }, 1000);
 
+      
+
       const timeBetweenDates = async toDate => {
         var dateEntered = await new Date(
           response.data.game.currentRound,
         ).getTime();
         dateEntered += 2 * 60 * 1000;
         dateEntered += 35 * 1000;
+        
+
 
         //console.log(new Date(dateEntered).toTimeString());
 
@@ -105,8 +142,10 @@ const Parity = () => {
           (await new Date(dateEntered).getTime()) - now.getTime();
 
         //console.log(new Date(difference).toTimeString());
+        
 
         if (difference <= 0) {
+
           
           // setLastWinners({
           //   color: 'R',
@@ -150,6 +189,7 @@ const Parity = () => {
           setHour(hours);
           setDays(days);
         }
+        setLoading(false)
       };
 
       const winnerLogic = async toDate => {
@@ -169,6 +209,7 @@ const Parity = () => {
 
         if (difference <= 0) {
           clearInterval(winnerTimer);
+          
           // Timer done
           try {
             const winner = await axios.get(
@@ -176,7 +217,7 @@ const Parity = () => {
             );
             setWinnerPhoto(winner.data[0].url);
             setNewWinner(winner.data[0]);
-
+            setLoadingButton(false)
             console.log('dddddddddddddddddggtteefvddddd', winner.data[0].color);
           } catch (error) {
             console.log(error);
@@ -217,6 +258,7 @@ const Parity = () => {
 
   const fivesecTimerfnc = async () => {
     setwinnerModal(true);
+    playSound()
     setTimeout(() => {
       setwinnerModal(false)
       getfirstData()
@@ -249,7 +291,7 @@ const Parity = () => {
 
         if (isPut.data == 'ok') {
           var body = {
-            email: 'rahulbisht683@gmail.com',
+            email: userEmail,
             roundid: roundid,
             placed: selectedValue,
             amount: selectedAmount,
@@ -267,7 +309,7 @@ const Parity = () => {
             text: "Amount Placed",
             duration: Snackbar.LENGTH_LONG,
           })
-        }, 200)
+        },200)
         console.log(isPut.data);
       }else {
         setTimeout(()=>{
@@ -316,6 +358,31 @@ const Parity = () => {
         style={{
           flex: 1,
         }}>
+          <Modal transparent = {true}
+          visible = {loading}
+          style={{
+           padding : 1,
+          alignItems : "center",
+          justifyContent : "center",
+            
+          }}>
+            <View
+            style={{
+              height :dimension.height,
+              width : dimension.width,
+              alignItems : "center",
+          justifyContent : "center",
+          backgroundColor : "rgba(0,0,0,0.6)"
+            
+            }}>
+<Sprinkle isVisible={loading} color={'rgba(14, 207, 104,1)'} size={37} type={"Circle"} />
+<Text
+style={{
+  color : "rgba(255,255,255,0.5)",
+  fontSize : RFValue(12)
+}}>Getting Data</Text>
+</View>
+          </Modal>
         <Modal visible={winnerModal} transparent={true} animationType={'fade'}>
           <View
             style={{
@@ -743,6 +810,8 @@ const Parity = () => {
               width: dimension.width,
               paddingHorizontal: dimension.width * 0.02,
             }}>
+              {loadingButton ? (
+                <>
             <View
               style={{
                 flexDirection: 'row',
@@ -1075,6 +1144,304 @@ const Parity = () => {
                 </View>
               </TouchableOpacity>
             </View>
+            </>
+            ) : (
+              <>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              <TouchableOpacity
+                >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.25,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    Join Red
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+               >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.25,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    Join Green
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.25,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    Join Violet
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: dimension.height * 0.01,
+              }}>
+              <TouchableOpacity
+               >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    0
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+               >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    1
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+               >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    2
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    3
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    4
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: dimension.height * 0.01,
+              }}>
+              <TouchableOpacity
+                >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    5
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+               >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    6
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    7
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+               >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    8
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+               >
+                <View
+                  style={{
+                    height: dimension.height * 0.04,
+                    width: dimension.width * 0.14,
+                    backgroundColor: "rgba(92, 91, 88,1)",
+                    borderRadius: 2,
+                    elevation: 5,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                    }}>
+                    9
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            </>
+            )}
           </View>
         </View>
 
@@ -1226,15 +1593,19 @@ const Parity = () => {
                 maxToRenderPerBatch={10}
                 keyExtractor={(item, index) => `key${index}`}
                 renderItem={({item}) => (
+                  
                   <View
-                    style={{
-                      width: dimension.width,
-                      paddingHorizontal: dimension.width * 0.04,
-                      paddingVertical: dimension.height * 0.02,
-                      borderBottomColor: 'rgba(125, 130, 130,0.7)',
-                      flexDirection: 'row',
-                      borderBottomWidth: 1,
-                    }}>
+                   >
+                      {item ? (
+                        <View
+                        style={{
+                          width: dimension.width,
+                          paddingHorizontal: dimension.width * 0.04,
+                          paddingVertical: dimension.height * 0.02,
+                          borderBottomColor: 'rgba(125, 130, 130,0.7)',
+                          flexDirection: 'row',
+                          borderBottomWidth: 1,
+                        }}>
                     <Text
                       style={{
                         width: dimension.width * 0.25,
@@ -1296,7 +1667,11 @@ const Parity = () => {
                           }}></View>
                       </View>
                     </View>
+                    </View>
+                    ) : null}
                   </View>
+                  
+                  
                 )}></FlatList>
             </>
           ) : (
