@@ -6,7 +6,7 @@ const ReferEarn = () => {
   return (
     <>
       <View>
-        <Text>Hello</Text>
+        <Text>Hello World</Text>
       </View>
     </>
   );
